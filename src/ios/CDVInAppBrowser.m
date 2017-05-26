@@ -711,7 +711,6 @@
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= FOOTER_HEIGHT;
             
-            NSLog(@"DB1");
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -722,7 +721,6 @@
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= LOCATIONBAR_HEIGHT;
             
-            NSLog(@"DB2");
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -736,11 +734,9 @@
             // webView take up whole height less toolBar height
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= TOOLBAR_HEIGHT;
-            NSLog(@"DB3");
             [self setWebViewFrame:webViewBounds];
         } else {
             // no toolBar, expand webView to screen dimensions
-            NSLog(@"DB4");
             [self setWebViewFrame:self.view.bounds];
         }
     }
@@ -779,12 +775,10 @@
         if ([toolbarPosition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
             toolbarFrame.origin.y = 0;
             webViewBounds.origin.y += toolbarFrame.size.height;
-            NSLog(@"DB5");
             [self setWebViewFrame:webViewBounds];
         } else {
             toolbarFrame.origin.y = (webViewBounds.size.height + LOCATIONBAR_HEIGHT);
         }
-        NSLog(@"DB6");
         [self setWebViewFrame:webViewBounds];
 
     } else {
@@ -797,7 +791,6 @@
             // webView take up whole height less locationBar height
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= LOCATIONBAR_HEIGHT;
-            NSLog(@"DB7");
             [self setWebViewFrame:webViewBounds];
 
             // move locationBar down
@@ -805,7 +798,6 @@
             self.addressLabel.frame = locationbarFrame;
         } else {
             // no locationBar, expand webView to screen dimensions
-            NSLog(@"DB8");
             [self setWebViewFrame:self.view.bounds];
         }
     }
