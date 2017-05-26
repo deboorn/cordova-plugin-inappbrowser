@@ -146,12 +146,16 @@
         NSString* userAgent = [CDVUserAgentUtil originalUserAgent];
         NSString* overrideUserAgent = [self settingForKey:@"OverrideUserAgent"];
         NSString* appendUserAgent = [self settingForKey:@"AppendUserAgent"];
+        
         if(overrideUserAgent){
             userAgent = overrideUserAgent;
         }
         if(appendUserAgent){
             userAgent = [userAgent stringByAppendingString: appendUserAgent];
         }
+        
+        userAgent = @"Mozilla/5.0 (iPad; CPU OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko)";
+        
         self.inAppBrowserViewController = [[CDVInAppBrowserViewController alloc] initWithUserAgent:userAgent prevUserAgent:[self.commandDelegate userAgent] browserOptions: browserOptions];
         self.inAppBrowserViewController.navigationDelegate = self;
 
@@ -241,6 +245,7 @@
         if (weakSelf.inAppBrowserViewController != nil) {
             CGRect frame = [[UIScreen mainScreen] bounds];
             frame.origin.y = 60;
+            frame.size.height -= 60;
             UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             
             UIViewController *tmpController = [[UIViewController alloc] init];
@@ -545,7 +550,7 @@
 
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
+//    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
     
     
@@ -665,6 +670,8 @@
 
 - (void) setWebViewFrame : (CGRect) frame {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
+    frame.origin.y -= 20;
+    frame.size.height += 20;
     [self.webView setFrame:frame];
     
 }
@@ -703,6 +710,8 @@
 
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= FOOTER_HEIGHT;
+            
+            NSLog(@"DB1");
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -712,6 +721,8 @@
 
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= LOCATIONBAR_HEIGHT;
+            
+            NSLog(@"DB2");
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -722,13 +733,14 @@
 
         if (toolbarVisible) {
             // locationBar is on top of toolBar, hide locationBar
-
             // webView take up whole height less toolBar height
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= TOOLBAR_HEIGHT;
+            NSLog(@"DB3");
             [self setWebViewFrame:webViewBounds];
         } else {
             // no toolBar, expand webView to screen dimensions
+            NSLog(@"DB4");
             [self setWebViewFrame:self.view.bounds];
         }
     }
@@ -767,10 +779,12 @@
         if ([toolbarPosition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
             toolbarFrame.origin.y = 0;
             webViewBounds.origin.y += toolbarFrame.size.height;
+            NSLog(@"DB5");
             [self setWebViewFrame:webViewBounds];
         } else {
             toolbarFrame.origin.y = (webViewBounds.size.height + LOCATIONBAR_HEIGHT);
         }
+        NSLog(@"DB6");
         [self setWebViewFrame:webViewBounds];
 
     } else {
@@ -783,6 +797,7 @@
             // webView take up whole height less locationBar height
             CGRect webViewBounds = self.view.bounds;
             webViewBounds.size.height -= LOCATIONBAR_HEIGHT;
+            NSLog(@"DB7");
             [self setWebViewFrame:webViewBounds];
 
             // move locationBar down
@@ -790,6 +805,7 @@
             self.addressLabel.frame = locationbarFrame;
         } else {
             // no locationBar, expand webView to screen dimensions
+            NSLog(@"DB8");
             [self setWebViewFrame:self.view.bounds];
         }
     }
@@ -1071,7 +1087,6 @@
     bgToolbar.barStyle = UIBarStyleDefault;
     [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     [self.view addSubview:bgToolbar];
-
     [super viewDidLoad];
 }
 
