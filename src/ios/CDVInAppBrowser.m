@@ -29,7 +29,7 @@
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
 #define    TOOLBAR_HEIGHT 44.0
-#define    STATUSBAR_HEIGHT 20.0
+#define    STATUSBAR_HEIGHT 0.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
@@ -177,15 +177,15 @@
     self.inAppBrowserViewController.modalPresentationStyle = presentationStyle;
 
     // Set Transition Style
-    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
     if (browserOptions.transitionstyle != nil) {
+        UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
         if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"fliphorizontal"]) {
             transitionStyle = UIModalTransitionStyleFlipHorizontal;
         } else if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"crossdissolve"]) {
             transitionStyle = UIModalTransitionStyleCrossDissolve;
         }
+        self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
     }
-    self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
 
     // prevent webView from bouncing
     if (browserOptions.disallowoverscroll) {
@@ -240,13 +240,15 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
             CGRect frame = [[UIScreen mainScreen] bounds];
+            frame.origin.y = 60;
             UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            
             UIViewController *tmpController = [[UIViewController alloc] init];
             [tmpWindow setRootViewController:tmpController];
             [tmpWindow setWindowLevel:UIWindowLevelNormal];
 
             [tmpWindow makeKeyAndVisible];
-            [tmpController presentViewController:nav animated:YES completion:nil];
+            [tmpController presentViewController:nav animated:NO completion:nil];
         }
     });
 }
@@ -270,7 +272,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
             _previousStatusBarStyle = -1;
-            [self.viewController dismissViewControllerAnimated:YES completion:nil];
+            [self.viewController dismissViewControllerAnimated:NO completion:nil];
         }
     });
 }
@@ -434,6 +436,7 @@
             return NO;
         }
     }
+    
     //if is an app store link, let the system handle it, otherwise it fails to load it
     else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
         [theWebView stopLoading];
@@ -544,7 +547,14 @@
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
-
+    
+    
+    NSLog(@"View Bounds %@", NSStringFromCGRect(self.view.bounds));
+    NSLog(@"View Frame %@", NSStringFromCGRect(self.view.frame));
+    NSLog(@"WebView Bounds %@", NSStringFromCGRect(self.webView.bounds));
+    NSLog(@"WebView Frame %@", NSStringFromCGRect(self.webView.frame));
+    
+    
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
     [self.view addSubview:self.webView];
@@ -560,7 +570,8 @@
     self.webView.opaque = YES;
     self.webView.scalesPageToFit = NO;
     self.webView.userInteractionEnabled = YES;
-
+    
+    
     self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.spinner.alpha = 1.000;
     self.spinner.autoresizesSubviews = YES;
@@ -648,11 +659,14 @@
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
+
+    
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
     [self.webView setFrame:frame];
+    
 }
 
 - (void)setCloseButtonTitle:(NSString*)title
@@ -816,9 +830,9 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
-            [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[weakSelf presentingViewController] dismissViewControllerAnimated:NO completion:nil];
         } else {
-            [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[weakSelf parentViewController] dismissViewControllerAnimated:NO completion:nil];
         }
     });
 }
